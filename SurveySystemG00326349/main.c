@@ -273,7 +273,8 @@ void closeFile()
 void addSurvey(struct survey** head_ptr)
 {
 
-	int inputPPS;
+	int inputPPS,inputAge,inputSmoker, inputDrink, inputExer, inputIncome;
+	int scanfBoolean;
 	struct survey *temp;
 	struct survey *newNode;
 
@@ -313,24 +314,69 @@ void addSurvey(struct survey** head_ptr)
 
 	scanf("%s", newNode->surveyDetails.address);//takes in the next 99 characters until a newline is found
 
-	printf("\nPlease enter your age:");
-	scanf("%d", &newNode->surveyDetails.age);
+	do {//take input for this statistic and repeat asking until a valid input is given
+		printf("\nPlease enter your age:"); //if scanf if gets a valid input it returns number of valid inputs
+		scanfBoolean=	scanf("%d", &inputAge);
+		if (scanfBoolean==1) {
+			newNode->surveyDetails.age = inputAge;
+		}
+		else {
+			printf("\nInvalid input detected, please use ints only");
+			fgetc(stdin);
+		}
+	} while (scanfBoolean != 1);
 	generateSurvey(newNode->surveyDetails.age, 5);
-
-	printf("\nPlease enter your yearly salary (as whole number):");
-	scanf("%d", &newNode->surveyDetails.income);
+	
+	do {//take input for this statistic and repeat asking until a valid input is given
+		printf("\nPlease enter your yearly salary (as whole number):");//if scanf if gets a valid input it returns number of valid inputs
+		scanfBoolean = scanf("%d", &inputIncome);
+		if (scanfBoolean == 1) {
+			newNode->surveyDetails.income = inputIncome;
+		}
+		else {
+			printf("\nInvalid input detected, please use ints only");
+			fgetc(stdin);
+		}
+	} while (scanfBoolean != 1);
 	generateSurvey(newNode->surveyDetails.income, 4);
 
-	printf("\nHow many cigarrettes do you smoke a day? :");
-	scanf("%d", &newNode->surveyDetails.ciggiesSmoked);
+	do {//take input for this statistic and repeat asking until a valid input is given
+		printf("\nHow many cigarrettes do you smoke a day? :");//if scanf if gets a valid input it returns number of valid inputs
+		scanfBoolean = scanf("%d", &inputSmoker);
+		if (scanfBoolean == 1) {
+			newNode->surveyDetails.ciggiesSmoked = inputSmoker;
+		}
+		else {
+			printf("\nInvalid input detected, please use ints only");
+			fgetc(stdin);
+		}
+	} while (scanfBoolean != 1);
 	generateSurvey(newNode->surveyDetails.ciggiesSmoked, 1);
 
-	printf("\nHow many units of alcohol do you drink in a day? :");
-	scanf("%d", &newNode->surveyDetails.unitsTaken);
+	do {//take input for this statistic and repeat asking until a valid input is given
+		printf("\nHow many units of alcohol do you drink in a day? :");//if scanf if gets a valid input it returns number of valid inputs
+		scanfBoolean = scanf("%d", &inputDrink);
+		if (scanfBoolean == 1) {
+			newNode->surveyDetails.unitsTaken = inputDrink;
+		}
+		else {
+			printf("\nInvalid input detected, please use ints only");
+			fgetc(stdin);
+		}
+	} while (scanfBoolean != 1);
 	generateSurvey(newNode->surveyDetails.unitsTaken, 2);
 
-	printf("\nHow many time do you exercise every week? :");
-	scanf("%d", &newNode->surveyDetails.timesExercised);
+	do {//take input for this statistic and repeat asking until a valid input is given
+		printf("\nHow many time do you exercise every week? :");//if scanf if gets a valid input it returns number of valid inputs
+		scanfBoolean = scanf("%d", &inputExer);
+		if (scanfBoolean == 1) {
+			newNode->surveyDetails.timesExercised = inputExer;
+		}
+		else {
+			printf("\nInvalid input detected, please use ints only");
+			fgetc(stdin);
+		}
+	} while (scanfBoolean != 1);
 	generateSurvey(newNode->surveyDetails.timesExercised, 3);
 
 
