@@ -1,0 +1,24 @@
+Percentage of people who smoke any amount from survey size of 1: 100.00 
+Percentage of people who smoke less than 20 from survey size of 1: 100.00 
+Percentage of people who smoke less than 40 from survey size of 1: 0.00 
+Percentage of people who smoke more than 40 from survey size of 1: 0.00 
+Percentage of people who drink no amount at all from survey size of 1: 0.00 
+Percentage of people who drink less than 2 units from survey size of 1: 0.00 
+Percentage of people who drink less than 4 units from survey size of 1: 0.00 
+Percentage of people who drink more than 4 units from survey size of 1: 100.00 
+Percentage of people who never exercise during in a week from survey size of 1: 0.00 
+Percentage of people who exercise less than 3 times in a week from survey size of 1: 0.00 
+Percentage of people who exercise less than 5 times in a week from survey size of 1: 0.00 
+Percentage of people who exercise more than 5 times in a week from survey size of 1: 100.00 
+Percentage of people who earn no income from survey size of 1: 0.00 
+Percentage of people who earn less than 20,000 from survey size of 1: 0.00 
+Percentage of people who earn less than 40,000 from survey size of 1: 0.00 
+Percentage of people who earn less than 60,000 from survey size of 1: 0.00 
+Percentage of people who earn less than 80,000 from survey size of 1: 100.00 
+Percentage of people who earn less than 100,000 from survey size of 1: 0.00 
+Percentage of people who earn more than 100,000 from survey size of 1: 0.00 
+Percentage of people in the 18-20 age bracket from survey size of 1: 0.00 
+Percentage of people in the 20-30 age bracket from survey size of 1: 0.00 
+Percentage of people in the 30-50 age bracket from survey size of 1: 0.00 
+Percentage of people in the 50-65 age bracket from survey size of 1: 100.00 
+Percentage of people in the 65+ age bracket from survey size of 1: 0.00 

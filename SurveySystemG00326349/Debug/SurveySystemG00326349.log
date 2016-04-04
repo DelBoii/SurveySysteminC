@@ -1,0 +1,8 @@
+﻿  main.c
+c:\users\ryan gordon\desktop\surveysystemg00326349\surveysystemg00326349\main.c(206): warning C4013: '_getch' undefined; assuming extern returning int
+c:\users\ryan gordon\desktop\surveysystemg00326349\surveysystemg00326349\main.c(213): warning C4013: 'strcmp' undefined; assuming extern returning int
+c:\users\ryan gordon\desktop\surveysystemg00326349\surveysystemg00326349\main.c(224): warning C4013: 'getch' undefined; assuming extern returning int
+c:\users\ryan gordon\desktop\surveysystemg00326349\surveysystemg00326349\main.c(281): warning C4047: '=': 'survey *' differs in levels of indirection from 'survey **'
+c:\users\ryan gordon\desktop\surveysystemg00326349\surveysystemg00326349\main.c(564): warning C4101: 'newNode': unreferenced local variable
+c:\users\ryan gordon\desktop\surveysystemg00326349\surveysystemg00326349\main.c(791): warning C4047: '=': 'survey *' differs in levels of indirection from 'survey **'
+  SurveySystemG00326349.vcxproj -> C:\Users\Ryan Gordon\Desktop\SurveySystemG00326349\Debug\SurveySystemG00326349.exe
