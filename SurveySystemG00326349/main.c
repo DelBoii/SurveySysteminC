@@ -44,12 +44,12 @@ void importReports(struct survey** head_ptr);
 
 FILE *fptr;
 char searchFName[20] = " ", searchLName[20] = " ";
-int searchNum = 0, searchChoice = 0;
+int searchNum = 0, searchChoice = 0, uniqueBoolean=0;
 char approvedUsrnames[3][7];
 char approvedPassword[3][7];
 int totalSurveys; //total amount of surveys taken to be used for generating statistics
 int smokerBrackets[4], drinkerBrackets[4], exerciseBrackets[4];
-int incomeBrackets[7], ageBrackets[5];//array where [0] is >20 cigs; [1] more than >40;[2] is <40 cigs [3] is any smoker
+int incomeBrackets[7], ageBrackets[5];//in these arrays index [0] is the special case (non drinker, no exercise)
 float smokerStats[4], drinkerStats[4], exerciseStats[4];
 float incomeStats[7], ageStats[5];
 char smokerPhrases[4][25] = { "any amount", "less than 20","less than 40","more than 40" };
@@ -84,7 +84,7 @@ void main()
 
 			//printf(" 5: Disaplay Length of list\n");
 
-			printf(" -1: To terminate\n");
+			printf(" -1: To logout\n");
 
 			scanf("%d", &choice);
 
@@ -92,6 +92,7 @@ void main()
 
 				//check PPS
 				addSurvey(&top);
+				if (uniqueBoolean!=1)
 				insertionSort(&top);//upon adding element to node list is sorted
 									//sort done here to ensure a sort is done upon every addition 
 
@@ -175,7 +176,7 @@ void main()
 int login() {
 
 	char userPassword[7] = "", usrname[7], inputChar;
-	int i;
+	int i,loginOrClose = 1;;
 	openFile();
 
 	int numofLogins = 3;
@@ -194,35 +195,43 @@ int login() {
 		}
 		closeFile();
 	}
+	printf("\nWould you like to precede with login or quit?\n\n 1. Login\n 0. Close\n");
+	scanf("%d",&loginOrClose);
 
+	if (loginOrClose == 0) {
+		exit(69);
+	}
+	else {
+		printf("Enter User name: ");
+		scanf("%s", usrname);
+		printf("Enter the password <any 6 characters>: ");
 
-	printf("Enter User name: ");
-	scanf("%s", usrname);
-	printf("Enter the password <any 6 characters>: ");
+		for (i = 0; i<6; i++)
+		{
 
-	for (i = 0; i<6; i++)
-	{
+			inputChar = _getch();
+			userPassword[i] = inputChar;
+			inputChar = '*';
+			printf("%c", inputChar);
+		}//obfuscate the input to the user
+		for (i = 0; i < 3; i++) {
 
-		inputChar = _getch();
-		userPassword[i] = inputChar;
-		inputChar = '*';
-		printf("%c", inputChar);
-	}//obfuscate the input to the user
-	for (i = 0; i < 3; i++) {
+			if (strcmp(approvedUsrnames[i], usrname) == 0) {//if user name equals one of the approved compare password
+				if (strcmp(userPassword, approvedPassword[i]) == 0) {//if user password equals one of the approved grant access
+					printf("\n\n\nLogin Successful!\n");
+					return 1;
+					break;
+				}//end nested if
 
-		if (strcmp(approvedUsrnames[i], usrname) == 0) {//if user name equals one of the approved compare password
-			if (strcmp(userPassword, approvedPassword[i]) == 0) {//if user password equals one of the approved grant access
-				printf("\n\n\nLogin Successful!\n");
-				return 1;
-				break;
-			}//end nested if
+			}//end if
 
-		}//end if
-		
-	}//end for
-	printf("Unsuccessful login, quitting application\n");
-	getch();
-	return 0;
+		}//end for
+		printf("Unsuccessful login, quitting application\n");
+		getch();
+		return 0;
+	}
+
+	
 }
 void openFile()
 {
@@ -279,26 +288,27 @@ void addSurvey(struct survey** head_ptr)
 	struct survey *newNode;
 
 
-	temp = head_ptr;
+	temp = *head_ptr;
 
 	newNode = (struct survey*)malloc(sizeof(struct survey));
 	printf("\nPlease enter your PPS number (Number must be unique)\n");
 	scanf("%d", &inputPPS);
 	while (temp != NULL)
 	{
-
 		if (inputPPS == temp->surveyDetails.ppsNo)
 		{
-			printf("\nPPS you have entered is not unique. \n\n");
-			free(newNode); free(temp);
-			return;
+			printf("\nPPS you have entered is not unique. The survey will be removed and you will be taken back to the menu\n\n");
+
+			free(newNode); 
+			uniqueBoolean = 1; //stops the sorted insert from activating as we have not added a node to sort
+			return;//end function skipping below code
+			
 		}
 		temp = temp->next;
-
-
-
-
 	}
+	printf("\nPPS is unique, continuing...\n\n");
+
+	uniqueBoolean = 0; //allows the sorted insert the be carried out at the end of this function
 	newNode->surveyDetails.ppsNo = inputPPS;
 	//if (checkUnique(&head_ptr, inputPPS) == 1) {
 
@@ -313,7 +323,7 @@ void addSurvey(struct survey** head_ptr)
 	printf("\nEnter current address: (Do not enter spaces with your address. Use _ or - or no divider at all)");
 
 	scanf("%s", newNode->surveyDetails.address);//takes in the next 99 characters until a newline is found
-
+	//e5adc80 commit includes code for menu validation. 
 	do {//take input for this statistic and repeat asking until a valid input is given
 		printf("\nPlease enter your age:"); //if scanf if gets a valid input it returns number of valid inputs
 		scanfBoolean=	scanf("%d", &inputAge);
@@ -538,8 +548,9 @@ void searchList(struct survey *head_ptr, int searchPPS, char fName[20], char lNa
 //the user may then change details for the survey. The PPS number is unchangeable however could be.
 void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char lName[20])
 {
-	int nodeNum = 0;
 	struct survey *temp;
+	int inputPPS, inputAge, inputSmoker, inputDrink, inputExer, inputIncome;
+	int scanfBoolean;
 	temp = head_ptr;
 
 	while (temp != NULL)
@@ -558,16 +569,65 @@ void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char l
 				scanf("%s", temp->surveyDetails.email);
 				printf("\nEnter current address: ");
 				scanf(" %s", temp->surveyDetails.address);//takes in the next 99 characters until a newline is found
-				printf("\nPlease enter your age:");
-				scanf("%d", &temp->surveyDetails.age);
-				printf("\nPlease enter your yearly salary (as whole number):");
-				scanf("%d", &temp->surveyDetails.income);
-				printf("\nHow many cigarrettes do you smoke a day? :");
-				scanf("%d", &temp->surveyDetails.ciggiesSmoked);
-				printf("\nHow many units of alcohol do you drink in a day? :");
-				scanf("%d", &temp->surveyDetails.unitsTaken);
-				printf("\nHow many time do you exercise every week? :");
-				scanf("%d", &temp->surveyDetails.timesExercised);
+				do {//take input for this statistic and repeat asking until a valid input is given
+					printf("\nPlease enter your age:"); //if scanf if gets a valid input it returns number of valid inputs
+					scanfBoolean = scanf("%d", &inputAge);
+					if (scanfBoolean == 1) {
+						temp->surveyDetails.age = inputAge;
+					}
+					else {
+						printf("\nInvalid input detected, please use ints only");
+						fgetc(stdin);
+					}
+				} while (scanfBoolean != 1);
+
+				do {//take input for this statistic and repeat asking until a valid input is given
+					printf("\nPlease enter your yearly salary (as whole number):");//if scanf if gets a valid input it returns number of valid inputs
+					scanfBoolean = scanf("%d", &inputIncome);
+					if (scanfBoolean == 1) {
+						temp->surveyDetails.income = inputIncome;
+					}
+					else {
+						printf("\nInvalid input detected, please use ints only");
+						fgetc(stdin);
+					}
+				} while (scanfBoolean != 1);
+
+				do {//take input for this statistic and repeat asking until a valid input is given
+					printf("\nHow many cigarrettes do you smoke a day? :");//if scanf if gets a valid input it returns number of valid inputs
+					scanfBoolean = scanf("%d", &inputSmoker);
+					if (scanfBoolean == 1) {
+						temp->surveyDetails.ciggiesSmoked = inputSmoker;
+					}
+					else {
+						printf("\nInvalid input detected, please use ints only");
+						fgetc(stdin);
+					}
+				} while (scanfBoolean != 1);
+
+				do {//take input for this statistic and repeat asking until a valid input is given
+					printf("\nHow many units of alcohol do you drink in a day? :");//if scanf if gets a valid input it returns number of valid inputs
+					scanfBoolean = scanf("%d", &inputDrink);
+					if (scanfBoolean == 1) {
+						temp->surveyDetails.unitsTaken = inputDrink;
+					}
+					else {
+						printf("\nInvalid input detected, please use ints only");
+						fgetc(stdin);
+					}
+				} while (scanfBoolean != 1);
+
+				do {//take input for this statistic and repeat asking until a valid input is given
+					printf("\nHow many time do you exercise every week? :");//if scanf if gets a valid input it returns number of valid inputs
+					scanfBoolean = scanf("%d", &inputExer);
+					if (scanfBoolean == 1) {
+						temp->surveyDetails.timesExercised = inputExer;
+					}
+					else {
+						printf("\nInvalid input detected, please use ints only");
+						fgetc(stdin);
+					}
+				} while (scanfBoolean != 1);
 
 				return;
 			}
@@ -584,20 +644,67 @@ void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char l
 			scanf("%s", temp->surveyDetails.email);
 			printf("\nEnter current address: ");
 			scanf(" %s", temp->surveyDetails.address);//takes in the next 99 characters until a newline is found
-			printf("\nPlease enter your age:");
-			scanf("%d", &temp->surveyDetails.age);
-			printf("\nPlease enter your yearly salary (as whole number):");
-			scanf("%d", &temp->surveyDetails.income);
-			printf("\nHow many cigarrettes do you smoke a day? :");
-			scanf("%d", &temp->surveyDetails.ciggiesSmoked);
-			printf("\nHow many units of alcohol do you drink in a day? :");
-			scanf("%d", &temp->surveyDetails.unitsTaken);
-			printf("\nHow many time do you exercise every week? :");
-			scanf("%d", &temp->surveyDetails.timesExercised);
+			do {//take input for this statistic and repeat asking until a valid input is given
+				printf("\nPlease enter your age:"); //if scanf if gets a valid input it returns number of valid inputs
+				scanfBoolean = scanf("%d", &inputAge);
+				if (scanfBoolean == 1) {
+					temp->surveyDetails.age = inputAge;
+				}
+				else {
+					printf("\nInvalid input detected, please use ints only");
+					fgetc(stdin);
+				}
+			} while (scanfBoolean != 1);
 
+			do {//take input for this statistic and repeat asking until a valid input is given
+				printf("\nPlease enter your yearly salary (as whole number):");//if scanf if gets a valid input it returns number of valid inputs
+				scanfBoolean = scanf("%d", &inputIncome);
+				if (scanfBoolean == 1) {
+					temp->surveyDetails.income = inputIncome;
+				}
+				else {
+					printf("\nInvalid input detected, please use ints only");
+					fgetc(stdin);
+				}
+			} while (scanfBoolean != 1);
+
+			do {//take input for this statistic and repeat asking until a valid input is given
+				printf("\nHow many cigarrettes do you smoke a day? :");//if scanf if gets a valid input it returns number of valid inputs
+				scanfBoolean = scanf("%d", &inputSmoker);
+				if (scanfBoolean == 1) {
+					temp->surveyDetails.ciggiesSmoked = inputSmoker;
+				}
+				else {
+					printf("\nInvalid input detected, please use ints only");
+					fgetc(stdin);
+				}
+			} while (scanfBoolean != 1);
+
+			do {//take input for this statistic and repeat asking until a valid input is given
+				printf("\nHow many units of alcohol do you drink in a day? :");//if scanf if gets a valid input it returns number of valid inputs
+				scanfBoolean = scanf("%d", &inputDrink);
+				if (scanfBoolean == 1) {
+					temp->surveyDetails.unitsTaken = inputDrink;
+				}
+				else {
+					printf("\nInvalid input detected, please use ints only");
+					fgetc(stdin);
+				}
+			} while (scanfBoolean != 1);
+
+			do {//take input for this statistic and repeat asking until a valid input is given
+				printf("\nHow many time do you exercise every week? :");//if scanf if gets a valid input it returns number of valid inputs
+				scanfBoolean = scanf("%d", &inputExer);
+				if (scanfBoolean == 1) {
+					temp->surveyDetails.timesExercised = inputExer;
+				}
+				else {
+					printf("\nInvalid input detected, please use ints only");
+					fgetc(stdin);
+				}
+			} while (scanfBoolean != 1);
 			return;
 		}
-		nodeNum++;
 		temp = temp->next;
 	}
 	printf("\n No surveys matching have been found ");
@@ -844,7 +951,9 @@ void importReports(struct survey** head_ptr) {
 			newNode->surveyDetails.address, newNode->surveyDetails.email, &newNode->surveyDetails.age, &newNode->surveyDetails.income, &newNode->surveyDetails.ciggiesSmoked,
 			&newNode->surveyDetails.unitsTaken, &newNode->surveyDetails.timesExercised);
 
+		newNode->next = *head_ptr;
 
+		*head_ptr = newNode;
 
 	} /* end while */
 
@@ -854,11 +963,6 @@ void importReports(struct survey** head_ptr) {
 		temp = temp->next;
 
 	}
-
-
-	newNode->next = *head_ptr;
-
-	*head_ptr = newNode;
 	totalSurveys++;
 
 	closeFile();
