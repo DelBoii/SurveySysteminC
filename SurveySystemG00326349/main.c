@@ -15,9 +15,6 @@ struct payload {
 	int timesExercised;
 	int income;
 	int unitsTaken;
-
-	//possible to insert int defining the various brackets for surveys
-
 };//using a struct which will hold the survey details within the node
   //a node containing a next pointer and a payload of details for the person
 struct survey
@@ -26,22 +23,27 @@ struct survey
 	struct payload surveyDetails;
 	struct survey* next;
 };
+////Methods used 
 int login();
 void openFile();
 void closeFile();
+void openReportFile();
+
 void addSurvey(struct survey** head_ptr);
 void insertionSort(struct survey **head_ref);
 void sortedInsert(struct survey** head_ref, struct survey* new_node);
+
 void printElements(struct survey* head_ptr);
 void searchList(struct survey *head_ptr, int searchPPS, char fName[20], char lName[20]);
 void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char lName[20]);
 void deletedSpecifiedSurvey(struct survey **head_ptr, int searchPPS);
+
 void generateSurvey(int input, int surveyType);
 void compileSurvey();
-void openReportFile();
+
 void printReports(struct survey* head_ptr);
 void importReports(struct survey** head_ptr);
-
+////Variables
 FILE *fptr;
 char searchFName[20] = " ", searchLName[20] = " ";
 int searchNum = 0, searchChoice = 0, uniqueBoolean=0;
@@ -65,13 +67,11 @@ void main()
 	int choice;
 	top = NULL;
 
-	while (login() == 1) {
+	while (login() == 1) {//runs login check first and if it is passed allows access to system
 
-		importReports(&top);
-		//import surveys if any
+		importReports(&top);//import surveys if any
 		do
 		{
-
 			printf("Please Enter your choice!\n");
 			printf(" 1: To add an element!\n");
 			printf(" 2: To display all the surveys!\n");
@@ -81,26 +81,20 @@ void main()
 			printf(" 6: Generate statistics!\n");
 			printf(" 7: To generate report files!\n");
 
-
-			//printf(" 5: Disaplay Length of list\n");
-
 			printf(" -1: To logout\n");
-
 			scanf("%d", &choice);
 
 			if (choice == 1) {
 
 				//check PPS
 				addSurvey(&top);
-				if (uniqueBoolean!=1)
-				insertionSort(&top);//upon adding element to node list is sorted
-									//sort done here to ensure a sort is done upon every addition 
-
+				if (uniqueBoolean!=1)//if the add survey method returns and the uniqueBoolean variable has not been incremented (i.e a unique PPS was entered) then perform a sort
+				insertionSort(&top);//upon adding element to node list is sorted //sort done here to ensure a sort is done upon every addition 
 			}
 			else if (choice == 2) {
 				printElements(top);
 			}
-			else if (choice == 3) {
+			else if (choice == 3) {//update a survey. Presents two ways to search for a survey and display it to the screen
 				printf("Would you like to search by name or PPS Number\n");
 				printf("1. Search by PPS \n2. Search by name\n");
 				scanf("%d", &searchChoice);
@@ -118,7 +112,7 @@ void main()
 				}
 
 			}
-			else if (choice == 4) {
+			else if (choice == 4) {//update a survey. Presents two ways to search for a survey and update it
 				printf("Would you like to search by name or PPS Number\n");
 				printf("1. Search by PPS \n2. Search by name\n");
 				scanf("%d", &searchChoice);
@@ -134,14 +128,13 @@ void main()
 					updateSurvey(top, searchNum, searchFName, searchLName);
 
 				}
-
 			}
-			else if (choice == 5) {
+			else if (choice == 5) {//search by PPS number and if survey is found remove from list
 				printf("\nEnter PPSNo to delete");
 				scanf("%d", &searchNum);
 				deletedSpecifiedSurvey(&top, searchNum);
 			}
-			else if (choice == 6) {
+			else if (choice == 6) {//runs a method which will generate statistics for the survey demographic
 				printf("\nGenerating Statistics....\n\n");
 				compileSurvey();
 			}
@@ -150,22 +143,7 @@ void main()
 				compileSurvey();
 				printReports(top);
 			}
-
-
-
-
-
-			//printElements(top);
-
-
-
-			//check node and display rather than ++ a var
-			//searchList();
-
-
 		} while (choice != -1);
-
-
 	}
 
 }
@@ -227,11 +205,11 @@ int login() {
 
 		}//end for
 		printf("Unsuccessful login, quitting application\n");
-		getch();
-		return 0;
+getch();
+return 0;
 	}
 
-	
+
 }
 void openFile()
 {
@@ -282,8 +260,9 @@ void closeFile()
 void addSurvey(struct survey** head_ptr)
 {
 
-	int inputPPS,inputAge,inputSmoker, inputDrink, inputExer, inputIncome;
-	int scanfBoolean;
+	int inputPPS, inputAge, inputSmoker, inputDrink, inputExer, inputIncome;
+	int scanfBoolean, emailChoice = 0;
+	char email[25];
 	struct survey *temp;
 	struct survey *newNode;
 
@@ -299,10 +278,10 @@ void addSurvey(struct survey** head_ptr)
 		{
 			printf("\nPPS you have entered is not unique. The survey will be removed and you will be taken back to the menu\n\n");
 
-			free(newNode); 
+			free(newNode);
 			uniqueBoolean = 1; //stops the sorted insert from activating as we have not added a node to sort
 			return;//end function skipping below code
-			
+
 		}
 		temp = temp->next;
 	}
@@ -310,18 +289,34 @@ void addSurvey(struct survey** head_ptr)
 
 	uniqueBoolean = 0; //allows the sorted insert the be carried out at the end of this function
 	newNode->surveyDetails.ppsNo = inputPPS;
-	//if (checkUnique(&head_ptr, inputPPS) == 1) {
 
 	newNode->surveyDetails.ppsNo = inputPPS;
 	printf("\nPlease enter your first name:");
 	scanf("%s", newNode->surveyDetails.fName);
 	printf("\nPlease enter your last name:");
 	scanf("%s", newNode->surveyDetails.lName);
-	printf("\nEnter email address: ");
-	scanf("%s", newNode->surveyDetails.email);
+	//validate the email address
+	do {
+		printf("\nEnter email address: ");
+		scanf("%s", email);
+	
+		if (strchr(email, '@')){
+			if (strchr(email, '.')) {//if both conditions are true continue
+				if (strstr(email, "com") != NULL) {//If the email contains an '@', a '.' && the string "com", email is validated
+					printf("Email validated!!");
+					break;
+				}//end inner if
+			}//end inner if
+		}//end if
+		printf("\nInvalidated!!");
+		printf("\nEnter -1 to quit program if you cannot find a valid email.\nOr enter any number to continue..");
+		scanf("%d", &emailChoice);//this option will show at least once for user
+	} while (emailChoice != -1);//while the user does not exit the validation
+	if (emailChoice != -1) {//only applies the email if it passed the test without user exitting
+		memcpy(newNode->surveyDetails.email, email, strlen(email) + 1);//copys the email array into our nodes email variable
+	}
 
 	printf("\nEnter current address: (Do not enter spaces with your address. Use _ or - or no divider at all)");
-
 	scanf("%s", newNode->surveyDetails.address);//takes in the next 99 characters until a newline is found
 	//e5adc80 commit includes code for menu validation. 
 	do {//take input for this statistic and repeat asking until a valid input is given
@@ -550,7 +545,8 @@ void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char l
 {
 	struct survey *temp;
 	int inputPPS, inputAge, inputSmoker, inputDrink, inputExer, inputIncome;
-	int scanfBoolean;
+	int scanfBoolean,emailChoice = 0;
+	char email[25];
 	temp = head_ptr;
 
 	while (temp != NULL)
@@ -559,14 +555,31 @@ void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char l
 		{
 			if (searchLName == temp->surveyDetails.lName)//compares the pps given by user with the survey
 			{
-				printf("\n Survey found with PPS:%d! \n Printing details....\n\n", searchPPS);
+				printf("\n Survey found with Search name: %s %s! \n Please update details....\n\n", searchFName, searchLName);
 
 				printf("\nPlease enter your first name:");
 				scanf("%s", temp->surveyDetails.fName);
 				printf("\nPlease enter your last name:");
 				scanf("%s", temp->surveyDetails.lName);
-				printf("\nEnter email address: ");
-				scanf("%s", temp->surveyDetails.email);
+				do {
+					printf("\nEnter email address: ");
+					scanf("%s", email);
+
+					if (strchr(email, '@')) {
+						if (strchr(email, '.')) {//if both conditions are true continue
+							if (strstr(email, "com") != NULL) {//If the email contains an '@', a '.' && the string "com", email is validated
+								printf("Email validated!!");
+								break;
+							}//end inner if
+						}//end inner if
+					}//end if
+					printf("\nInvalidated!!");
+					printf("\nEnter -1 to quit program if you cannot find a valid email.\nOr enter any number to continue..");
+					scanf("%d", &emailChoice);//this option will show at least once for user
+				} while (emailChoice != -1);//while the user does not exit the validation
+				if (emailChoice != -1) {//only applies the email if it passed the test without user exitting
+					memcpy(temp->surveyDetails.email, email, strlen(email) + 1);//copys the email array into our nodes email variable
+				}
 				printf("\nEnter current address: ");
 				scanf(" %s", temp->surveyDetails.address);//takes in the next 99 characters until a newline is found
 				do {//take input for this statistic and repeat asking until a valid input is given
@@ -640,8 +653,25 @@ void updateSurvey(struct survey *head_ptr, int searchPPS, char fName[20], char l
 			scanf("%s", temp->surveyDetails.fName);
 			printf("\nPlease enter your last name:");
 			scanf("%s", temp->surveyDetails.lName);
-			printf("\nEnter email address: ");
-			scanf("%s", temp->surveyDetails.email);
+			do {
+				printf("\nEnter email address: ");
+				scanf("%s", email);
+
+				if (strchr(email, '@')) {
+					if (strchr(email, '.')) {//if both conditions are true continue
+						if (strstr(email, "com") != NULL) {//If the email contains an '@', a '.' && the string "com", email is validated
+							printf("Email validated!!");
+							break;
+						}//end inner if
+					}//end inner if
+				}//end if
+				printf("\nInvalidated!!");
+				printf("\nEnter -1 to quit program if you cannot find a valid email.\nOr enter any number to continue..");
+				scanf("%d", &emailChoice);//this option will show at least once for user
+			} while (emailChoice != -1);//while the user does not exit the validation
+			if (emailChoice != -1) {//only applies the email if it passed the test without user exitting
+				memcpy(temp->surveyDetails.email, email, strlen(email) + 1);//copys the email array into our nodes email variable
+			}
 			printf("\nEnter current address: ");
 			scanf(" %s", temp->surveyDetails.address);//takes in the next 99 characters until a newline is found
 			do {//take input for this statistic and repeat asking until a valid input is given
@@ -718,7 +748,6 @@ void deletedSpecifiedSurvey(struct survey **head_ptr, int searchPPS) {
 	struct survey *old_temp;
 
 	if (*head_ptr == NULL)
-
 	{
 		printf("Nothing to delete\n"); //if list is empty prompt user 
 	}
@@ -941,7 +970,7 @@ void importReports(struct survey** head_ptr) {
 
 	openSurveyFile();
 
-	temp = head_ptr;
+	temp = *head_ptr;
 
 	newNode = (struct survey*)malloc(sizeof(struct survey));
 	while (!feof(fptr))
@@ -954,17 +983,15 @@ void importReports(struct survey** head_ptr) {
 		newNode->next = *head_ptr;
 
 		*head_ptr = newNode;
+		generateSurvey(newNode->surveyDetails.ciggiesSmoked, 1);
+		generateSurvey(newNode->surveyDetails.unitsTaken, 2);
+		generateSurvey(newNode->surveyDetails.timesExercised, 3);
+		generateSurvey(newNode->surveyDetails.income, 4);
+		generateSurvey(newNode->surveyDetails.age, 5);//adds the imported survey into our survey statistics
+		totalSurveys++;
 
 	} /* end while */
-
-	while (temp != NULL)
-	{
-
-		temp = temp->next;
-
-	}
-	totalSurveys++;
+	
 
 	closeFile();
 }
-
